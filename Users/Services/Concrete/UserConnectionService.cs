@@ -33,16 +33,20 @@ namespace Users.Services.Concrete
             return await repository.GetUserIpAddressesAsync(userId);
         }
 
-        public async Task<(DateTime Time, string Ip)> GetUserLastConnectionAsync(long userId)
+        public async Task<LastConnection> GetUserLastConnectionAsync(long userId)
         {
             var lastConnection = await cache.GetUserLastConnectionAsync(userId);
             if (lastConnection != null) 
-                return lastConnection.Value;
+                return lastConnection;
 
             var last = await repository.GetUserLastConnectionAsync(userId);
 
             await cache.SetUserLastConnectionAsync(userId, last.ConnectedAt, last.IpAddress);
-            return (last.ConnectedAt, last.IpAddress);
+            return new LastConnection
+            {
+                Ip = last.IpAddress,
+                Time = last.ConnectedAt
+            };
         }
 
         public async Task<Dictionary<string, DateTime>> GetLastSeenPerIpAsync(long userId)

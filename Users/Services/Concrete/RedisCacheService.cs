@@ -10,19 +10,19 @@ namespace Users.Services.Concrete
 
         public async Task SetUserLastConnectionAsync(long userId, DateTime time, string ip)
         {
-            var data = JsonSerializer.Serialize(new { Time = time, Ip = ip }, _jsonOptions);
+            var data = JsonSerializer.Serialize(new LastConnection { Time = time, Ip = ip }, _jsonOptions);
             await cache.SetStringAsync($"user:last:{userId}", data, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
         }
 
-        public async Task<(DateTime Time, string Ip)?> GetUserLastConnectionAsync(long userId)
+        public async Task<LastConnection> GetUserLastConnectionAsync(long userId)
         {
             var data = await cache.GetStringAsync($"user:last:{userId}");
-            return data == null ? null : JsonSerializer.Deserialize<(DateTime Time, string Ip)>(data, _jsonOptions);
+            return data == null ? null : JsonSerializer.Deserialize<LastConnection>(data, _jsonOptions);
         }
 
         public async Task SetLastSeenByIpAsync(string ip, DateTime time)
         {
-            await cache.SetStringAsync($"ip:last:{ip}", time.ToString("O"), new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3) });
+            await cache.SetStringAsync($"ip:last:{ip}", time.ToString(), new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3) });
         }
 
         public async Task<DateTime?> GetLastSeenByIpAsync(string ip)
@@ -30,5 +30,11 @@ namespace Users.Services.Concrete
             var str = await cache.GetStringAsync($"ip:last:{ip}");
             return str == null ? null : DateTime.Parse(str);
         }
+    }
+
+    public class LastConnection
+    {
+        public DateTime Time { get; set; }
+        public string Ip { get; set; }
     }
 }

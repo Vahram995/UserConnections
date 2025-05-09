@@ -34,7 +34,7 @@ namespace Users.Controllers
         public async Task<IActionResult> GetUserLast(long userId)
         {
             var result = await service.GetUserLastConnectionAsync(userId);
-            return Ok(new { result.Time, result.Ip });
+            return Ok(result);
         }
 
         [HttpGet("{userId}/lastIps")]

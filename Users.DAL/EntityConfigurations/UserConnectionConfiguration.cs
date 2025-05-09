@@ -14,6 +14,9 @@ namespace Users.DAL.EntityConfigurations
             builder.HasIndex(x => x.IpAddress);
             builder.HasIndex(e => new { e.UserId, e.ConnectedAt });
             builder.HasIndex(e => new { e.IpAddress, e.ConnectedAt });
+
+            builder.HasOne(x => x.User)
+                .WithMany(x => x.UserConnections);
         }
     }
 }
